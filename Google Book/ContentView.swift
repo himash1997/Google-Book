@@ -38,6 +38,7 @@ struct Home : View {
                 TextField("Search", text: self.$txt)
                 
                 Button(action: {
+            
                     
                 }, label: {
                     Image(systemName: "magnifyingglass")
@@ -90,7 +91,7 @@ class GetData : ObservableObject{
     
     init() {
         
-        let url = "https://www.googleapis.com/books/v1/volumes?q=harry"
+        let url = "https://www.googleapis.com/books/v1/volumes?q=harry+potter"
         let session = URLSession(configuration: .default)
         session.dataTask(with: URL(string: url)!) { (data, _, err) in
             if err != nil{
