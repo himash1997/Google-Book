@@ -9,6 +9,7 @@
 import SwiftUI
 import SDWebImageSwiftUI
 import SwiftyJSON
+import WebKit
 
 struct ContentView: View {
     var body: some View {
@@ -24,34 +25,44 @@ struct ContentView: View {
 struct Home : View {
     
     @ObservedObject var books = GetData()
+    @State var show = false
+    @State var url = ""
     
     var body : some View{
+        
         List(books.data){i in
+
             HStack{
-                
+                            
                 if i.imgurl != ""{
                     
-                    WebImage(url: URL(string: i.imgurl))
+                  WebImage(url: URL(string: i.imgurl)!)
                     .resizable()
                     .frame(width: 120, height: 170)
                     .cornerRadius(10)
                     
+                }else{
+                    Image("books").resizable().frame(width: 120, height: 170).cornerRadius(10)
                 }
                 
-                VStack(alignment: .leading, spacing: 10){
+                VStack(alignment: .leading, spacing: 10) {
                     
-                    Text(i.title)
-                    .fontWeight(.bold)
+                    Text(i.title).fontWeight(.bold)
                     
                     Text(i.authors)
                     
-                    Text(i.desc)
-                    .font(.caption)
+                    Text(i.desc).font(.caption)
+                        .lineLimit(4)
+                        .multilineTextAlignment(.leading)
                     
                 }
-                
+            }.onTapGesture {
+                self.url = i.url
+                self.show.toggle()
             }
-        }
+        }.sheet(isPresented: self.$show){
+            WebView(url: self.url)
+        }.onAppear { UITableView.appearance().separatorStyle = .none }
     }
 }
 
@@ -80,7 +91,7 @@ class GetData : ObservableObject{
                 let authors = i["volumeInfo"]["authors"].array!
                 let description = i["volumeInfo"]["description"].stringValue
                 let imgurl = i["volumeInfo"]["imageLinks"]["thumbnail"].stringValue
-                let url = i["webReaderLink"].stringValue
+                let url = i["volumeInfo"]["previewLink"].stringValue
                 
                 var author = ""
                 
@@ -107,5 +118,23 @@ struct Book : Identifiable {
     var desc : String
     var imgurl : String
     var url : String
+    
+}
+
+struct WebView : UIViewRepresentable {
+    
+    var url : String
+    
+    func makeUIView(context: UIViewRepresentableContext<WebView>) -> WKWebView {
+        
+        let view = WKWebView()
+        view.load(URLRequest(url: URL(string: url)!))
+        return view
+        
+    }
+    
+    func updateUIView(_ uiView: WebView.UIViewType, context: UIViewRepresentableContext<WebView>) {
+        
+    }
     
 }
