@@ -27,42 +27,59 @@ struct Home : View {
     @ObservedObject var books = GetData()
     @State var show = false
     @State var url = ""
+    @State var txt = ""
     
     var body : some View{
         
-        List(books.data){i in
-
+        VStack{
+            
             HStack{
-                            
-                if i.imgurl != ""{
-                    
-                  WebImage(url: URL(string: i.imgurl)!)
-                    .resizable()
-                    .frame(width: 120, height: 170)
-                    .cornerRadius(10)
-                    
-                }else{
-                    Image("books").resizable().frame(width: 120, height: 170).cornerRadius(10)
-                }
                 
-                VStack(alignment: .leading, spacing: 10) {
+                TextField("Search", text: self.$txt)
+                
+                Button(action: {
                     
-                    Text(i.title).fontWeight(.bold)
+                }, label: {
+                    Image(systemName: "magnifyingglass")
+                    .foregroundColor(Color.black)
+                })
+                
+            }.padding()
+            
+            List(books.data){i in
+
+                HStack{
+                                
+                    if i.imgurl != ""{
+                        
+                      WebImage(url: URL(string: i.imgurl)!)
+                        .resizable()
+                        .frame(width: 120, height: 170)
+                        .cornerRadius(10)
+                        
+                    }else{
+                        Image("books").resizable().frame(width: 120, height: 170).cornerRadius(10)
+                    }
                     
-                    Text(i.authors)
-                    
-                    Text(i.desc).font(.caption)
-                        .lineLimit(4)
-                        .multilineTextAlignment(.leading)
-                    
+                    VStack(alignment: .leading, spacing: 10) {
+                        
+                        Text(i.title).fontWeight(.bold)
+                        
+                        Text(i.authors)
+                        
+                        Text(i.desc).font(.caption)
+                            .lineLimit(4)
+                            .multilineTextAlignment(.leading)
+                        
+                    }
+                }.onTapGesture {
+                    self.url = i.url
+                    self.show.toggle()
                 }
-            }.onTapGesture {
-                self.url = i.url
-                self.show.toggle()
-            }
-        }.sheet(isPresented: self.$show){
-            WebView(url: self.url)
-        }.onAppear { UITableView.appearance().separatorStyle = .none }
+            }.sheet(isPresented: self.$show){
+                WebView(url: self.url)
+            }.onAppear { UITableView.appearance().separatorStyle = .none }
+        }
     }
 }
 
@@ -73,7 +90,7 @@ class GetData : ObservableObject{
     
     init() {
         
-        let url = "https://www.googleapis.com/books/v1/volumes?q=harry+potter"
+        let url = "https://www.googleapis.com/books/v1/volumes?q=harry"
         let session = URLSession(configuration: .default)
         session.dataTask(with: URL(string: url)!) { (data, _, err) in
             if err != nil{
@@ -138,3 +155,4 @@ struct WebView : UIViewRepresentable {
     }
     
 }
+
