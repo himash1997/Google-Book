@@ -21,12 +21,6 @@ struct ContentView: View {
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
-}
-
 struct Home : View {
     
     @ObservedObject var books = GetData()
@@ -42,11 +36,9 @@ struct Home : View {
                     .frame(width: 120, height: 170)
                     .cornerRadius(10)
                     
-                }else{
-                    
                 }
                 
-                VStack{
+                VStack(alignment: .leading, spacing: 10){
                     
                     Text(i.title)
                     .fontWeight(.bold)
@@ -70,7 +62,7 @@ class GetData : ObservableObject{
     
     init() {
         
-        let url = "https://www.googleapis.com/books/v1/volumes?q=java"
+        let url = "https://www.googleapis.com/books/v1/volumes?q=harry+potter"
         let session = URLSession(configuration: .default)
         session.dataTask(with: URL(string: url)!) { (data, _, err) in
             if err != nil{
