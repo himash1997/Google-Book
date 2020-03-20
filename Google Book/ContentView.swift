@@ -33,7 +33,32 @@ struct Home : View {
     
     var body : some View{
         List(books.data){i in
-            Text(i.id)
+            HStack{
+                
+                if i.imgurl != ""{
+                    
+                    WebImage(url: URL(string: i.imgurl))
+                    .resizable()
+                    .frame(width: 120, height: 170)
+                    .cornerRadius(10)
+                    
+                }else{
+                    
+                }
+                
+                VStack{
+                    
+                    Text(i.title)
+                    .fontWeight(.bold)
+                    
+                    Text(i.authors)
+                    
+                    Text(i.desc)
+                    .font(.caption)
+                    
+                }
+                
+            }
         }
     }
 }
@@ -59,12 +84,20 @@ class GetData : ObservableObject{
             for i in items{
                 
                 let id = i["id"].stringValue
-                let title = i["volumeInfo"]["title"]
+                let title = i["volumeInfo"]["title"].stringValue
                 let authors = i["volumeInfo"]["authors"].array!
+                let description = i["volumeInfo"]["description"].stringValue
+                let imgurl = i["volumeInfo"]["imageLinks"]["thumbnail"].stringValue
+                let url = i["webReaderLink"].stringValue
                 
+                var author = ""
+                
+                for j in authors{
+                    author += "\(j.stringValue)"
+                }
                 
                 DispatchQueue.main.async {
-                    self.data.append(Book(id: id, title: "", authors: "", desc: "", imgurl: "", url: ""))
+                    self.data.append(Book(id: id, title: title, authors: author, desc: description, imgurl: imgurl, url: url))
                 }
                 
             }
